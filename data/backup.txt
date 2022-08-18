@@ -1,0 +1,404 @@
+
+
+
+//fields
+/*
+float    lamin = 29.347623;  //  lower bound for the latitude in decimal degrees
+ float    lomin = -98.890736; //  lower bound for the longitude in decimal degrees
+ 
+ float    lamax =31.252545; //  upper bound for the latitude in decimal degrees
+ float    lomax = -96.594199; //  upper bound for the longitude in decimal degrees*/
+//https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=29.347623&lomin=-98.890736&lamax=31.252545&lomax=-96.594199
+/*float    lamin = 30.058892;
+ float    lomin = -97.910531;
+ 
+ float    lamax = 30.542653;
+ float    lomax = -97.520481;*/
+//https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=30.058892&lomin=-97.910531&lamax=30.542653&lomax=-97.520481
+
+//https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=30.128210965263797&lomin=-97.74423598998125&lamax=30.256970429727343&lomax=-97.59555607637411
+float    lamin; //= 30.128210965263797;
+float    lomin; //= -97.74423598998125;
+
+float    lamax; //= 30.256970429727343;
+float    lomax;// = -97.59555607637411;
+
+float latcenter;
+float loncenter;
+
+int height;
+int width;
+
+JSONObject flight_data;
+JSONArray states;
+
+JSONObject flight_dataLive;
+JSONArray statesLive;
+
+
+//JSONArray flight;
+
+final  int  Index_icao24  =  0; //  Unique ICAO 24-bit address of the transponder in hex string representation.
+final  int  Index_callsign  =  1; //  Callsign of the vehicle (8 chars). Can be null if no callsign has been received.
+final  int  Index_origin_country  =  2;  //  Country name inferred from the ICAO 24-bit address.
+final  int  Index_time_position  =  3; //  Unix timestamp (seconds) for the last position update. Can be null if no position report was received by OpenSky within the past 15s.
+final  int  Index_last_contact  =  4 ;//  Unix timestamp (seconds) for the last update in general. This field is updated for any new, valid message received from the transponder.
+final  int  Index_longitude  =  5; //  WGS-84 longitude in decimal degrees. Can be null.
+final  int  Index_latitude  =  6; //  WGS-84 latitude in decimal degrees. Can be null.
+final  int  Index_baro_altitude  =  7;  //  Barometric altitude in meters. Can be null.
+final  int  Index_on_ground  =  8; //  Boolean value which indicates if the position was retrieved from a surface position report.
+final  int  Index_velocity  =  9; //  Velocity over ground in m/s. Can be null.
+final  int  Index_true_track  =  10; //  True track in decimal degrees clockwise from north (north=0°). Can be null.
+final  int  Index_vertical_rate  =  11; //  Vertical rate in m/s. A positive value indicates that the airplane is climbing, a negative value indicates that it descends. Can be null.
+final  int  Index_sensors  =  12;  //  IDs of the receivers which contributed to this state vector. Is null if no filtering for sensor was used in the request.
+final  int  Index_geo_altitude  =  13; //  Geometric altitude in meters. Can be null.
+final  int  Index_squawk  =  14; //  The transponder code aka Squawk. Can be null.
+final  int  Index_spi  =  15; //  Whether flight status indicates special purpose indicator.
+final  int  Index_position_source  =  16; //  Origin of this state’s position: 0 = ADS-B, 1 = ASTERIX, 2 = MLAT
+
+
+/*final  String  icao24  =  0; //  Unique ICAO 24-bit address of the transponder in hex string representation.
+ final  String  callsign  =  1; //  Callsign of the vehicle (8 chars). Can be null if no callsign has been received.
+ final String  origin_country  =  2; //  Country name inferred from the ICAO 24-bit address.
+ final  int  time_position  =  3; //  Unix timestamp (seconds) for the last position update. Can be null if no position report was received by OpenSky within the past 15s.
+ final  int  last_contact  =  4; //  Unix timestamp (seconds) for the last update in general. This field is updated for any new, valid message received from the transponder.
+ final  float  longitude  =  5;  //  WGS-84 longitude in decimal degrees. Can be null.
+ final  float  latitude  =  6; //  WGS-84 latitude in decimal degrees. Can be null.
+ final  float  baro_altitude  =  7; //  Barometric altitude in meters. Can be null.
+ final  boolean  on_ground  =  8; //  Boolean value which indicates if the position was retrieved from a surface position report.
+ final  float  velocity  =  9;  //  Velocity over ground in m/s. Can be null.
+ final  float  true_track  =  10;  //  True track in decimal degrees clockwise from north (north=0°). Can be null.
+ final  float  vertical_rate  =  11; //  Vertical rate in m/s. A positive value indicates that the airplane is climbing, a negative value indicates that it descends. Can be null.
+ final  int[]  sensors  =  12;  //  IDs of the receivers which contributed to this state vector. Is null if no filtering for sensor was used in the request.
+ final  float  geo_altitude  =  13; //  Geometric altitude in meters. Can be null.
+ final  String  squawk  =  14; //  The transponder code aka Squawk. Can be null.
+ final  boolean  spi  =  15; //  Whether flight status indicates special purpose indicator.
+ final  int  position_source  =  16; //  Origin of this state’s position: 0 = ADS-B, 1 = ASTERIX, 2 = MLAT
+ */
+
+
+class Plane {
+  String icao24; // Unique ICAO 24-bit address of the transponder in hex string representation.             
+  String callsign; // Callsign of the vehicle (8 chars). Can be null if no callsign has been received.         
+  String origin_country; // Country name inferred from the ICAO 24-bit address.                
+  int time_position; // Unix timestamp (seconds) for the last position update. Can be null if no position report was received by OpenSky within the past 15s. 
+  int last_contact; // Unix timestamp (seconds) for the last update in general. This field is updated for any new, valid message received from the transponder.  
+  float longitude; // WGS-84 longitude in decimal degrees. Can be null.                
+  float latitude; // WGS-84 latitude in decimal degrees. Can be null.                
+  float baro_altitude; // Barometric altitude in meters. Can be null.                 
+  boolean on_ground; // Boolean value which indicates if the position was retrieved from a surface position report.          
+  float velocity; // Velocity over ground in m/s. Can be null.                
+  float true_track; // TRUE track in decimal degrees clockwise from north (north=0°). Can be null.            
+  float vertical_rate; // Vertical rate in m/s. A positive value indicates that the airplane is climbing, a negative value indicates that it descends. Can be null. 
+  int[] sensors; // IDs of the receivers which contributed to this state vector. Is null if no filtering for sensor was used in the request.  
+  float geo_altitude; // Geometric altitude in meters. Can be null.                 
+  String squawk; // The transponder code aka Squawk. Can be null.                
+  boolean spi; // Whether flight status indicates special purpose indicator.                 
+  int position_source; // Origin of this state’s position: 0 #ERROR! ADS-B, 1 #ERROR! ASTERIX, 2 #ERROR! MLAT   
+  String name; //combo of data 
+  PImage icon; 
+  float drawLat;
+  float drawLng;
+  float track;
+  Plane(JSONArray flightInfo) {
+
+    latitude = flightInfo.getFloat(Index_latitude);
+    longitude =    flightInfo.getFloat(Index_longitude);
+    track = flightInfo.getFloat(Index_true_track);
+    name = flightInfo.getString(Index_callsign)  + flightInfo.getString(Index_icao24);
+  }
+
+  void DrawPlane() {
+
+    drawLat = map(latitude, lamin, lamax, 0.0, 500 );
+    drawLng = map(longitude, lomin, lomax, 0.0, 500);
+    // pushMatrix();
+    fill(128, 0, 0, 128);
+    text(name, drawLng, 512-drawLat);
+    //float rotation =  radians(track);
+    //  float fRotation = TWO_PI - radians(track);
+    // rotate(rotation);
+    // rotate(radians(track));
+    //translate(flightLat, flightLng);
+    icon = icons[0];
+    if (track > 45 && track < 134) {
+      icon = icons[1];
+    }
+    if (track > 135 && track < 224 ) {
+      icon = icons[2];
+    }
+    if (track > 270) {
+      icon = icons[3];
+    }
+    println(track + " radians " + radians(track) + " name " + name  + " " +  latitude + " " + longitude);
+    icon.resize(10, 10);
+
+
+    // rotate(radians(track));
+    image(icon, drawLng, 512-drawLat);
+
+
+    //   image(images[0], 0, 0);
+
+
+
+    // translate(flightLat2, flightLng2); 
+
+
+    // text(flight2, 0, 0);
+
+
+    //  
+
+    // image(images[1], 0, 0);
+
+    //   popMatrix();
+    //   rotate(fRotation);
+    // popMatrix();
+  }
+} 
+//30.1944444444, -97.67
+void DrawAirport(float latitude, float longitude) {
+  // float latitude = 30.1944444444;
+  // float longitude = -97.67;
+
+  float drawLat, drawLng; 
+  drawLat = map(latitude, lamin, lamax, 0.0, 500 );
+  drawLng = map(longitude, lomin, lomax, 0.0, 500);
+  text("Austin Bergstrom", drawLat, drawLng);
+  icons[4].resize(30, 30);
+  image(icons[4], drawLat - 10, drawLng - 10);
+}
+
+
+
+
+int numFrames = 5;  // The number of frames in the animation
+int currentFrame = 0;
+PImage[] icons = new PImage[numFrames];
+PImage mapimg;
+int moveX, moveY;
+void setup() {
+  background(209, 244, 255);
+  //flight_data =  loadJSONObject("data/flightdata.json");
+  // states = flight_data.getJSONArray("states");
+
+  latcenter = 30.1944444444;
+  loncenter = -97.67;
+  lamin = latcenter - 1;
+  lomin = loncenter - 1;
+
+  lamax = latcenter + 1;
+  lomax =  loncenter + 1;
+
+  icons[0] = loadImage("planeN.png"); 
+  icons[1] = loadImage("planeE.png"); 
+  icons[2] = loadImage("planeS.png"); 
+  icons[3] = loadImage("planeW.png"); 
+  icons[4] = loadImage("airport.png");
+  String map_url = "https://api.mapbox.com/styles/v1/mapbox/light-v10/static/" + loncenter + "," + latcenter  + ",8.9,0/300x200?access_token=pk.eyJ1IjoiYmhpbm1hbnR4IiwiYSI6ImNrbTJ2YXVobzFnb3IycG1yOXJ1Y3Q1MzgifQ.Qjj7MzbU8wKvfZDShfrapA";
+
+  //mapimg = imageOpen(map_url);
+  //loadImage('<a href="https://'+'
+  mapimg = loadImage("https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-97.67,30.1944,8.9,0/300x200?access_token=pk.eyJ1IjoiYmhpbm1hbnR4IiwiYSI6ImNrbTJ2YXVobzFnb3IycG1yOXJ1Y3Q1MzgifQ.Qjj7MzbU8wKvfZDShfrapA");
+  size(500, 500);
+  translate(width / 2, height / 2);
+  imageMode(CENTER);
+  image(mapimg, 0, 0);
+
+
+  flight_data =  loadJSONObject("https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=" + lamin + "&lomin=" + lomin + "&lamax=" + lamax + "&lomax=" + lomax + "");
+  states = flight_data.getJSONArray("states");
+
+  int numPlanes =  states.size();
+
+
+  DrawAirport(latcenter, loncenter);
+
+  Plane[] planes = new Plane[numPlanes];
+
+  for (int i = 0; i < numPlanes; i++) {
+    planes [i] = new Plane(states.getJSONArray(i));
+    planes[i].DrawPlane();
+  }
+
+
+  frameRate(.25);
+
+  // flight_dataLive =  loadJSONObject("https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=30.128210965263797&lomin=-97.74423598998125&lamax=30.256970429727343&lomax=-97.59555607637411");
+  //  statesLive = flight_dataLive.getJSONArray("states");
+
+  //loadJSONObject(
+  //String[] earthquakes = loadStrings("https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=30.128210965263797&lomin=-97.74423598998125&lamax=30.256970429727343&lomax=-97.59555607637411");
+  // JSONArray testArray;
+  // testArray = JSONArray.parse(earthquakes);
+
+  /* Plane myPlane0 = new Plane(states.getJSONArray(0));
+   Plane myPlane1 = new Plane(states.getJSONArray(1));
+   Plane myPlane2 = new Plane(states.getJSONArray(2));
+   Plane myPlane3 = new Plane(states.getJSONArray(3));
+   myPlane0.DrawPlane();
+   myPlane1.DrawPlane();
+   myPlane2.DrawPlane();
+   myPlane3.DrawPlane();
+   */
+  /*flightLat = (states.getJSONArray(0).getFloat(Index_latitude) -  lamin) * 100;
+   flightLng =    (states.getJSONArray(0).getFloat(Index_longitude) - lomin) * 100;
+   track = states.getJSONArray(0).getFloat(Index_true_track);
+   
+   flightLat2 = (states.getJSONArray(1).getFloat(Index_latitude) -  lamin) * 100;
+   flightLng2 =  (states.getJSONArray(1).getFloat(Index_longitude) - lomin) * 100;
+   track2  = states.getJSONArray(1).getFloat(Index_true_track);
+   
+   flight = states.getJSONArray(0).getString(Index_callsign)  + states.getJSONArray(0).getString(Index_icao24);
+   flight2 = states.getJSONArray(1).getString(Index_callsign)  + states.getJSONArray(1).getString(Index_icao24);
+   
+   
+   
+   
+   
+   
+   textSize(10);
+   fill(0, 0, 0, 128);
+   
+   
+   images[0]  = loadImage("plane.png");
+   images[1]  = loadImage("plane.png");
+   images[2]  = loadImage("plane.png");
+   
+   
+   
+                        /*images[2]  = loadImage("PT_anim0002.gif");
+   images[3]  = loadImage("PT_anim0003.gif"); 
+   images[4]  = loadImage("PT_anim0004.gif");
+   images[5]  = loadImage("PT_anim0005.gif"); 
+   images[6]  = loadImage("PT_anim0006.gif");
+   images[7]  = loadImage("PT_anim0007.gif"); 
+   images[8]  = loadImage("PT_anim0008.gif");
+   images[9]  = loadImage("PT_anim0009.gif"); 
+   images[10] = loadImage("PT_anim0010.gif");
+   images[11] = loadImage("PT_anim0011.gif"); */  /*
+
+   // If you don't want to load each image separately
+   // and you know how many frames you have, you
+   // can create the filenames as the program runs.
+   // The nf() command does number formatting, which will
+   // ensure that the number is (in this case) 4 digits.
+   //for (int i = 0; i < numFrames; i++) {
+   //  String imageName = "PT_anim" + nf(i, 4) + ".gif";
+   //  images[i] = loadImage(imageName);
+   //}
+   println("lat");
+   println(flightLat);
+   println("lng");
+   println(flightLng);
+   //  println(flight);
+   println("lat2");
+   println(flightLat2);
+   println("lng2");
+   println(flightLng2);
+   println("track1");
+   println(track);
+   println("track2");
+   println(track2);
+   //  println(flight);
+   
+   
+   
+   
+   images[0].resize(50, 50);
+   images[1].resize(50, 50);
+   
+   
+   
+   
+   
+   
+   //rotate(radians(track));
+   
+   translate(128, 128);
+   // text(flight, 0, 0); 
+   // text("text(flight, 0, 10); ", 50, 60); 
+   text(flight, flightLat, flightLng);
+   rotate(track);
+   //translate(flightLat, flightLng);
+   image(images[0], flightLat, flightLng);
+   //   image(images[0], 0, 0);
+   //   pushMatrix();
+   // popMatrix();
+   // pushMatrix();
+   // translate(flightLat2, flightLng2); 
+   fill(128, 0, 0, 128);
+   rotate(-track);
+   // text(flight2, 0, 0);
+   text(flight2, flightLat2, flightLng2);
+   
+   //  rotate(track2);
+   
+   
+   image(images[1], flightLat2, flightLng2);
+   // image(images[1], 0, 0);
+   */
+  // popMatrix();
+} 
+
+void draw() {
+
+  flight_data =  loadJSONObject("https://bhinmantx:Flyeye1!@opensky-network.org/api/states/all?lamin=" + lamin + "&lomin=" + lomin + "&lamax=" + lamax + "&lomax=" + lomax + "");
+  states = flight_data.getJSONArray("states");/*
+  background(209, 244, 255);
+  int numPlanes =  states.size();
+
+
+  DrawAirport(latcenter, loncenter);
+
+  Plane[] planes = new Plane[numPlanes];
+
+  for (int i = 0; i < numPlanes; i++) {
+    planes [i] = new Plane(states.getJSONArray(i));
+    planes[i].DrawPlane();
+  }
+}
+/*
+ // latcenter = 30.1944444444;
+ // loncenter = -97.67;
+
+'https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-97.67,30.1944,8.9,0/300x200?access_token=pk.eyJ1IjoiYmhpbm1hbnR4IiwiYSI6ImNrbTJ2YXVobzFnb3IycG1yOXJ1Y3Q1MzgifQ.Qjj7MzbU8wKvfZDShfrapA";
+
+'https://api.mapbox.com/styles/v1/mapbox/light-v10/static/" + -97.67 + "," + 30.1944  + ",8.9,0/300x200?access_token=pk.eyJ1IjoiYmhpbm1hbnR4IiwiYSI6ImNrbTJ2YXVobzFnb3IycG1yOXJ1Y3Q1MzgifQ.Qjj7MzbU8wKvfZDShfrapA";
+                                  'api.mapbox.com/styles/v1/mapbox/light-v10/static/" + loncenter + "," + latcenter  + ",8.9,0/300x200?access_token=pk.eyJ1IjoiYmhpbm1hbnR4IiwiYSI6ImNrbTJ2YXVobzFnb3IycG1yOXJ1Y3Q1MzgifQ.Qjj7MzbU8wKvfZDShfrapA";
+map=loadImage('<a href="https://'+'api.mapbox.com/styles/v1/dirma/light-v10/static/'+clon+','+clat+','+zoom+',0.00,0.00/1200x800?access_token=TOKEN'" target="_blank" rel="nofollow">https://'+'api.mapbox.com/styles/v1/dirma/cizi74roy001h2spanpymjfdd/static/'+clon+','+clat+','+zoom+',0.00,0.00/1200x800?access_token=TOKEN'</a>);    
+//map=loadImage('<a href="https://'+'api.mapbox.com/styles/v1/dirma/cizi74roy001h2spanpymjfdd/static/'+clon+','+clat+','+zoom+',0.00,0.00/1200x800?access_token=TOKEN'" target="_blank" rel="nofollow">https://'+'api.mapbox.com/styles/v1/dirma/cizi74roy001h2spanpymjfdd/static/'+clon+','+clat+','+zoom+',0.00,0.00/1200x800?access_token=TOKEN'</a>);
+
+// imageMode(CENTER);
+// mapimg = loadImage('https://" + "api.mapbox.com/v4/mapbox.dark/" + latcenter + ",0,2,1/1024x512.png?access_token=pk.eyJ1IjoiYmhpbm1hbnR4IiwiYSI6ImNrbTJ2YXVobzFnb3IycG1yOXJ1Y3Q1MzgifQ.Qjj7MzbU8wKvfZDShfrapA');
+*/
+/*
+void draw() {
+ 
+ image(images[0], 1, 1);
+ pushMatrix();
+ translate(moveX++, moveY++); 
+ rotate(radians(45));
+ image(images[1], 11, 5);
+ popMatrix();
+ 
+ }
+ */
+/*
+void draw() { 
+ background(0);
+ currentFrame = (currentFrame+1) % numFrames;  // Use % to cycle through frames
+ int offset = 0;
+ // image(images[(currentFrame+offset) % numFrames], 1, height/2);
+ 
+ 
+ 
+/*
+ for (int x = -100; x < width; x += images[0].width) { 
+ image(images[(currentFrame+offset) % numFrames], x, -20);
+ offset+=2;
+ image(images[(currentFrame+offset) % numFrames], x, height/2);
+ offset+=2;
+ }*//*
+}*/
